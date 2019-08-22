@@ -10,4 +10,4 @@ class News(Base):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     title = sqlalchemy.Column(sqlalchemy.String(256), nullable=False)
     url = sqlalchemy.Column(sqlalchemy.String(256), nullable=False)
-    created = sqlalchemy.Column(sqlalchemy.String(256), nullable=False)
+    created = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False)

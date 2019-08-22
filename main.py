@@ -1,25 +1,30 @@
 from data_base.core import get_db
 from data_base.tables import News
 from parser import get_news_from_url
+from datetime import datetime
 
 SOURCE_URL = 'https://news.ycombinator.com'
 
 NEWS_TEST_DATA = [
-    {"title": "title_1",
+    {"title": "title_1123",
      "url": "https://example.com",
-     "created": "ISO 8601"},
+     "created": datetime.today()
+     },
 
     {"title": "title_2",
      "url": "https://example.com",
-     "created": "ISO 8601"},
+     "created": datetime.today()
+     },
 
     {"title": "title_3",
      "url": "https://example.com",
-     "created": "ISO 8601"},
+     "created": datetime.today()
+     },
 
     {"title": "title_4",
      "url": "https://example.com",
-     "created": "ISO 8601"},
+     "created": datetime.today()
+     },
 ]
 
 

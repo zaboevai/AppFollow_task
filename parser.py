@@ -1,4 +1,4 @@
-import time
+from datetime import datetime
 from html.parser import HTMLParser
 
 import requests
@@ -34,7 +34,7 @@ class NewsParser(HTMLParser):
     def handle_data(self, data):
         if self.is_find:
             self.news['title'] = data
-            self.news['created'] = time.localtime()
+            self.news['created'] = datetime.today()
 
     def get_news(self):
         return self.fresh_news
