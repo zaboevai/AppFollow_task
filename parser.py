@@ -1,6 +1,8 @@
 import time
 from html.parser import HTMLParser
 
+import requests
+
 
 class NewsParser(HTMLParser):
 
@@ -36,3 +38,10 @@ class NewsParser(HTMLParser):
 
     def get_news(self):
         return self.fresh_news
+
+
+def get_news_from_url(url, news_count=0):
+    response = requests.get(url=url, )
+    parser = HackerNewsParser(news_count=news_count)
+    parser.feed(response.text)
+    return parser.get_news()

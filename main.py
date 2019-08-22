@@ -1,5 +1,6 @@
-from data_base.core import DataBase
+from data_base.core import get_db
 from data_base.tables import News
+from parser import get_news_from_url
 
 SOURCE_URL = 'https://news.ycombinator.com'
 
@@ -20,19 +21,21 @@ NEWS_TEST_DATA = [
      "url": "https://example.com",
      "created": "ISO 8601"},
 ]
-# create db and table
-NewsDB = DataBase()
-NewsDB.create_db()
-NewsDB.create_tables()
-session = NewsDB.get_session()
 
-# insert
-NewsDB.insert(table=News, rows=NEWS_TEST_DATA)
 
-# select
-news_data = session.query(News).filter()
-for news in news_data:
-    print(news.id, news.title, news.url, news.created)
+def run_news_parser(url, test_mode=False):
+    if test_mode:
+        parsed_news = NEWS_TEST_DATA
+    else:
+        parsed_news = get_news_from_url(url=url, news_count=2)
+
+    news_db, session = get_db()
+    news_db.insert(table=News, rows=parsed_news)
+
+    # select
+    news_data = session.query(News).filter()
+    for news in news_data:
+        print(news.id, news.title, news.url, news.created)
 
 """
 decompose task:
@@ -50,3 +53,5 @@ API
 4) send response
 
 """
+
+run_news_parser(url=SOURCE_URL, test_mode=True)

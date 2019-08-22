@@ -29,20 +29,20 @@ class DataBase:
             if self.is_row_exist(table=table, row=row):
                 continue
             row = table(**row)
-            session.add(row)
-        session.commit()
+            self.session.add(row)
+        self.session.commit()
 
     def is_row_exist(self, table, row):
         row = self.session.query(table).filter(table.title == row['title'])
-        for data in row:
+        for _ in row:
             return True
             break
         return False
 
 
-# if __name__ == '__MAIN__':
-NewsDB = DataBase()
-NewsDB.create_db()
-NewsDB.create_tables()
-
-session = NewsDB.get_session()
+def get_db():
+    news_db = DataBase()
+    news_db.create_db()
+    news_db.create_tables()
+    session = news_db.get_session()
+    return news_db, session
