@@ -8,7 +8,7 @@ from urllib.parse import urlparse, urljoin
 import requests
 
 from data_base.core import DataBase
-from data_base.news import News
+from app.models import News
 
 NEWS_TEST_DATA = [
     {"title": "title_1123",
