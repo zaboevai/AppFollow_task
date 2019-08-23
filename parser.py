@@ -7,7 +7,7 @@ from urllib.parse import urlparse, urljoin
 
 import requests
 
-from data_base.core import get_db
+from data_base.core import DataBase
 from data_base.news import News
 
 NEWS_TEST_DATA = [
@@ -35,13 +35,14 @@ NEWS_TEST_DATA = [
 
 class HackerNewsParser(HTMLParser, ABC):
 
-    def __init__(self, base_url, news_count=0, *args, **kwargs):
+    def __init__(self, url, news_count=0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.is_find = False
         self.news_count = news_count
         self.fresh_news = []
         self.news = {}
-        self.base_url = base_url
+        self.url = url
+        self.base_url = url.split('/news?')[0]
         self.is_find = False
 
     def handle_starttag(self, tag, attrs):
@@ -77,24 +78,13 @@ class HackerNewsParser(HTMLParser, ABC):
         return self.fresh_news
 
 
-def get_news_from_url(url, news_count=0):
-    response = requests.get(url=url, )
-    base_url = url.split('/news?')[0]
-
-    parser = HackerNewsParser(base_url=base_url, news_count=news_count)
-    parser.feed(response.text)
-
-    return parser.get_news()
-
-
-class NewsParser(Thread):
+class NewsParser(Thread, DataBase):
 
     def __init__(self, url, news_count=0, sleep_time=0, test_mode=False, lock=None):
         super().__init__()
         self.url = url
         self.news_count = news_count
         self.test_mode = test_mode
-        self.news_db, self.session = get_db()
         self.lock = lock
         self.inserted_count = 0
         self.sleep_time = sleep_time
@@ -104,24 +94,24 @@ class NewsParser(Thread):
         if self.test_mode:
             parsed_news = NEWS_TEST_DATA
         else:
-            parsed_news = get_news_from_url(url=self.url, news_count=self.news_count)
+            response = requests.get(url=self.url)
+            parser = HackerNewsParser(url=self.url, news_count=self.news_count)
+            parser.feed(response.text)
+            parsed_news = parser.get_news()
+
+        if parsed_news:
+            self.create_db()
 
         with self.lock:
-            self.inserted_count = self.news_db.insert(table=News, rows=parsed_news)
-
-    def get_total_count_rows_from_db(self):
-        total_rows = self.session.query(News).filter().count()
-        return total_rows
+            self.inserted_count = self.insert(table=News, rows=parsed_news)
 
     def run(self):
 
         try:
             while True:
-
-                # print(f'before : {self.get_total_count_rows_from_db()}')
                 self.run_news_parser()
                 print(f'inserted: {self.inserted_count}')
-                # print(f'after: {self.get_total_count_rows_from_db()}')
+                # print(f'after: {self.news_db.get_total_count_rows_from_db()}')
                 if self.sleep_time == 0:
                     break
 

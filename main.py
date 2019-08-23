@@ -3,6 +3,7 @@ from threading import Thread, Lock
 from api import run_api
 from parser import NewsParser
 
+
 SOURCE_URL = 'https://news.ycombinator.com'
 
 MAX_NEWS_COUNT = 30
@@ -33,8 +34,9 @@ def run():
 
     # run_news_parser(url=SOURCE_URL, news_count=MAX_NEWS_COUNT, test_mode=False)
 
-    run_api(debug=False)
-    # print(get_rows_from_db())
+    run_api(debug=True)
+
     parser.join()
+
 
 run()
