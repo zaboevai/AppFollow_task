@@ -7,8 +7,9 @@ from urllib.parse import urlparse, urljoin
 
 import requests
 
-from data_base.core import DataBase
+from app import db
 from app.models import News
+from data_base.core import DataBase
 
 NEWS_TEST_DATA = [
     {"title": "title_1123",
@@ -78,9 +79,9 @@ class HackerNewsParser(HTMLParser, ABC):
         return self.fresh_news
 
 
-class NewsParser(Thread, DataBase):
+class NewsParser(Thread):
 
-    def __init__(self, url, news_count=0, sleep_time=0, test_mode=False, lock=None):
+    def __init__(self, url, data_base, news_count=0, sleep_time=0, test_mode=False, lock=None):
         super().__init__()
         self.url = url
         self.news_count = news_count
@@ -88,6 +89,7 @@ class NewsParser(Thread, DataBase):
         self.lock = lock
         self.inserted_count = 0
         self.sleep_time = sleep_time
+        self.db = data_base
 
     def run_news_parser(self, ):
 
@@ -99,11 +101,9 @@ class NewsParser(Thread, DataBase):
             parser.feed(response.text)
             parsed_news = parser.get_news()
 
-        if parsed_news:
-            self.create_db()
-
+        news_db = DataBase(data_base=db)
         with self.lock:
-            self.inserted_count = self.insert(table=News, rows=parsed_news)
+            self.inserted_count = news_db.insert(table=News, rows=parsed_news)
 
     def run(self):
 
