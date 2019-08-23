@@ -1,9 +1,11 @@
 from data_base.core import get_db
-from data_base.tables import News
+from data_base.news import News
 from parser import get_news_from_url
 from datetime import datetime
 
 SOURCE_URL = 'https://news.ycombinator.com'
+
+MAX_NEWS_COUNT = 30
 
 NEWS_TEST_DATA = [
     {"title": "title_1123",
@@ -29,18 +31,21 @@ NEWS_TEST_DATA = [
 
 
 def run_news_parser(url, test_mode=False):
+    news_db, session = get_db()
+
     if test_mode:
         parsed_news = NEWS_TEST_DATA
     else:
-        parsed_news = get_news_from_url(url=url, news_count=2)
+        parsed_news = get_news_from_url(url=url, news_count=MAX_NEWS_COUNT)
 
-    news_db, session = get_db()
     news_db.insert(table=News, rows=parsed_news)
 
     # select
-    news_data = session.query(News).filter()
-    for news in news_data:
-        print(news.id, news.title, news.url, news.created)
+    tottal_rows = session.query(News).filter().count()
+    print(tottal_rows)
+    # news_data = session.query(News).filter()
+    # for news in news_data:
+    #     print(news.id, news.title, news.url, news.created)
 
 """
 decompose task:
@@ -59,4 +64,4 @@ API
 
 """
 
-run_news_parser(url=SOURCE_URL, test_mode=True)
+run_news_parser(url=SOURCE_URL, test_mode=False)

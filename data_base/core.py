@@ -1,7 +1,7 @@
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from data_base.tables import Base
+from data_base.news import Base
 
 
 class DataBase:
@@ -27,16 +27,16 @@ class DataBase:
 
         for row in rows:
             if self.is_row_exist(table=table, row=row):
+                print(f'Row {row} already exists')
                 continue
             row = table(**row)
             self.session.add(row)
         self.session.commit()
 
     def is_row_exist(self, table, row):
-        row = self.session.query(table).filter(table.title == row['title'])
+        row = self.session.query(table.id).filter(table.title == row['title'])
         for _ in row:
             return True
-            break
         return False
 
 
