@@ -1,7 +1,9 @@
+import json
+
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from data_base.news import Base
+from data_base.news import Base, News
 
 
 class DataBase:
@@ -27,7 +29,7 @@ class DataBase:
 
         for row in rows:
             if self.is_row_exist(table=table, row=row):
-                print(f'Row {row} already exists')
+                # print('Row "{}" already exists'.format(str(row['title'])))
                 continue
             row = table(**row)
             self.session.add(row)
@@ -46,3 +48,19 @@ def get_db():
     news_db.create_tables()
     session = news_db.get_session()
     return news_db, session
+
+
+def get_json_rows_from_db():
+    news_db, session = get_db()
+    news_data = session.query(News).filter()
+    rows = []
+    for news in news_data:
+        rows.append({'id': news.id,
+                     'title': news.title,
+                     'url': news.url,
+                     'created': news.created.isoformat()
+                     })
+
+    json_rows = json.dumps(rows, indent=4)
+
+    return json_rows
