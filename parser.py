@@ -1,6 +1,8 @@
+import time
 from abc import ABC
 from datetime import datetime
 from html.parser import HTMLParser
+from threading import Thread
 from urllib.parse import urlparse, urljoin
 
 import requests
@@ -85,15 +87,45 @@ def get_news_from_url(url, news_count=0):
     return parser.get_news()
 
 
-def run_news_parser(url, news_count=0, test_mode=False):
-    news_db, session = get_db()
+class NewsParser(Thread):
 
-    if test_mode:
-        parsed_news = NEWS_TEST_DATA
-    else:
-        parsed_news = get_news_from_url(url=url, news_count=news_count)
+    def __init__(self, url, news_count=0, sleep_time=0, test_mode=False, lock=None):
+        super().__init__()
+        self.url = url
+        self.news_count = news_count
+        self.test_mode = test_mode
+        self.news_db, self.session = get_db()
+        self.lock = lock
+        self.inserted_count = 0
+        self.sleep_time = sleep_time
 
-    news_db.insert(table=News, rows=parsed_news)
+    def run_news_parser(self, ):
 
-    total_rows = session.query(News).filter().count()
-    print(total_rows)
+        if self.test_mode:
+            parsed_news = NEWS_TEST_DATA
+        else:
+            parsed_news = get_news_from_url(url=self.url, news_count=self.news_count)
+
+        with self.lock:
+            self.inserted_count = self.news_db.insert(table=News, rows=parsed_news)
+
+    def get_total_count_rows_from_db(self):
+        total_rows = self.session.query(News).filter().count()
+        return total_rows
+
+    def run(self):
+
+        try:
+            while True:
+
+                # print(f'before : {self.get_total_count_rows_from_db()}')
+                self.run_news_parser()
+                print(f'inserted: {self.inserted_count}')
+                # print(f'after: {self.get_total_count_rows_from_db()}')
+                if self.sleep_time == 0:
+                    break
+
+                time.sleep(self.sleep_time)
+
+        except BaseException as exc:
+            raise exc

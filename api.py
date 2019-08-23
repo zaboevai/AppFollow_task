@@ -11,5 +11,5 @@ def index_page():
     return response
 
 
-def run_api():
-    app.run('localhost', 8000, debug=True)
+def run_api(debug=False):
+    app.run('localhost', 8000, debug=debug)

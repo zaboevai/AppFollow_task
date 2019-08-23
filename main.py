@@ -1,7 +1,7 @@
-from threading import Thread
+from threading import Thread, Lock
 
 from api import run_api
-from parser import run_news_parser
+from parser import NewsParser
 
 SOURCE_URL = 'https://news.ycombinator.com'
 
@@ -26,10 +26,15 @@ API
 
 
 def run():
-    run_news_parser(url=SOURCE_URL, news_count=MAX_NEWS_COUNT, test_mode=False)
+    lock = Lock()
 
-    run_api()
+    parser = NewsParser(url=SOURCE_URL, news_count=MAX_NEWS_COUNT, sleep_time=10, test_mode=False, lock=lock)
+    parser.start()
+
+    # run_news_parser(url=SOURCE_URL, news_count=MAX_NEWS_COUNT, test_mode=False)
+
+    run_api(debug=False)
     # print(get_rows_from_db())
-
+    parser.join()
 
 run()

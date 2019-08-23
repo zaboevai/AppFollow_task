@@ -26,14 +26,16 @@ class DataBase:
         return self.session
 
     def insert(self, table, rows):
-
+        insert_count = 0
         for row in rows:
             if self.is_row_exist(table=table, row=row):
                 # print('Row "{}" already exists'.format(str(row['title'])))
                 continue
             row = table(**row)
             self.session.add(row)
+            insert_count += 1
         self.session.commit()
+        return insert_count
 
     def is_row_exist(self, table, row):
         row = self.session.query(table.id).filter(table.title == row['title'])
