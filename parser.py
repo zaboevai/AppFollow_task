@@ -5,6 +5,31 @@ from urllib.parse import urlparse, urljoin
 
 import requests
 
+from data_base.core import get_db
+from data_base.news import News
+
+NEWS_TEST_DATA = [
+    {"title": "title_1123",
+     "url": "https://example.com",
+     "created": datetime.today()
+     },
+
+    {"title": "title_2",
+     "url": "https://example.com",
+     "created": datetime.today()
+     },
+
+    {"title": "title_3",
+     "url": "https://example.com",
+     "created": datetime.today()
+     },
+
+    {"title": "title_4",
+     "url": "https://example.com",
+     "created": datetime.today()
+     },
+]
+
 
 class HackerNewsParser(HTMLParser, ABC):
 
@@ -58,3 +83,17 @@ def get_news_from_url(url, news_count=0):
     parser.feed(response.text)
 
     return parser.get_news()
+
+
+def run_news_parser(url, news_count=0, test_mode=False):
+    news_db, session = get_db()
+
+    if test_mode:
+        parsed_news = NEWS_TEST_DATA
+    else:
+        parsed_news = get_news_from_url(url=url, news_count=news_count)
+
+    news_db.insert(table=News, rows=parsed_news)
+
+    total_rows = session.query(News).filter().count()
+    print(total_rows)
