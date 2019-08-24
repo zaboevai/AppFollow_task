@@ -81,7 +81,7 @@ class HackerNewsParser(HTMLParser, ABC):
 
 class NewsParser(Thread):
 
-    def __init__(self, url, data_base, news_count=0, sleep_time=0, test_mode=False, lock=None):
+    def __init__(self, url, news_count=0, sleep_time=0, test_mode=False, lock=None):
         super().__init__()
         self.url = url
         self.news_count = news_count
@@ -89,7 +89,6 @@ class NewsParser(Thread):
         self.lock = lock
         self.inserted_count = 0
         self.sleep_time = sleep_time
-        self.db = data_base
 
     def run_news_parser(self, ):
 
@@ -104,17 +103,15 @@ class NewsParser(Thread):
         news_db = DataBase(data_base=db)
         with self.lock:
             self.inserted_count = news_db.insert(table=News, rows=parsed_news)
+            print(f'inserted: {self.inserted_count}')
 
     def run(self):
 
         try:
             while True:
                 self.run_news_parser()
-                print(f'inserted: {self.inserted_count}')
-                # print(f'after: {self.news_db.get_total_count_rows_from_db()}')
                 if self.sleep_time == 0:
                     break
-
                 time.sleep(self.sleep_time)
 
         except BaseException as exc:
