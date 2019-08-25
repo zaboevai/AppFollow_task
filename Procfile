@@ -1,1 +1,1 @@
-worker: python hacker_news.py
+web: flask db upgrade; python hacker_news.py
