@@ -1,2 +1,2 @@
-web: python api.py $PORT
+web: gunicorn api:app
 worker: python hacker_news.py
