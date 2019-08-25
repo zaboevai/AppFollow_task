@@ -34,7 +34,7 @@ def run():
                          test_mode=False,
                          lock=lock)
     news_parser.start()
-    app.run('localhost', 8000, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=False)
     news_parser.join()
 
 
