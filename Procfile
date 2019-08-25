@@ -1,1 +1,1 @@
-web: python hacker_news.py
+worker: python hacker_news.py
