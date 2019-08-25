@@ -1,1 +1,1 @@
-web: flask db init; flask db migrate; flask db upgrade; gunicorn hacker_news:app
+web: flask db init; flask db migrate; flask db upgrade; python hacker_news.py gunicorn api:app
