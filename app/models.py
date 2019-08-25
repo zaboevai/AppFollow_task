@@ -1,4 +1,3 @@
-import sqlalchemy
 from app import db
 
 
