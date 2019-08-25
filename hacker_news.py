@@ -1,7 +1,8 @@
 from threading import Lock
 
 from app import app, db
-from parser import NewsParser
+from data_base.core import DataBase
+from parsers.core import Parser
 
 SOURCE_URL = 'https://news.ycombinator.com'
 
@@ -28,15 +29,16 @@ API
 def run():
 
     lock = Lock()
-
-    parser = NewsParser(url=SOURCE_URL,
-                        news_count=MAX_NEWS_COUNT,
-                        sleep_time=10,
-                        test_mode=False,
-                        lock=lock)
-    parser.start()
+    news_db = DataBase(data_base=db)
+    news_parser = Parser(url=SOURCE_URL,
+                         data_base=news_db,
+                         news_count=MAX_NEWS_COUNT,
+                         sleep_time=10,
+                         test_mode=False,
+                         lock=lock)
+    news_parser.start()
     app.run('localhost', 8000, debug=True)
-    parser.join()
+    news_parser.join()
 
 
 if __name__ == '__main__':
