@@ -1,2 +1,3 @@
-worker: flask db upgrade; python hacker_news.py
+init: flask db init; flask db migrate; flask db upgrade;
+worker: python hacker_news.py
 web: gunicorn api:app;
