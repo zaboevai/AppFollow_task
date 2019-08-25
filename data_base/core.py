@@ -1,11 +1,15 @@
 import json
-from app.models import News
 
 
 class DataBase:
 
     def __init__(self, data_base):
         self.db = data_base
+        try:
+            from app.models import News
+            self.news_model = News
+        except ImportError:
+            raise ImportError
 
     def insert(self, table, rows):
         if not self.db.session:
@@ -29,34 +33,41 @@ class DataBase:
         return False
 
     def get_total_count_rows_from_db(self):
-        total_rows = self.db.session.query(News).filter().count()
+        total_rows = self.db.session.query(self.news_model).filter().count()
         return total_rows
 
-    def get_json_rows_from_db(self, news_limit=None, offset=None, order_by=None, order_by_desc=None):
+    def get_rows_from_db(self, limit=None, offset=None, order_by=None, order_by_desc=None):
         if not self.db.session:
             raise BaseException('Вставка невозможна, не удалось определить сессию')
 
-        news_data = self.db.session.query(News).order_by(News.created.desc()).offset(offset).limit(news_limit)
+        total_limit = int(limit)+int(offset)
+
+        news_data = self.db.session.query(self.news_model).order_by(self.news_model.created.desc()).limit(total_limit)
 
         if order_by_desc:
             if order_by_desc == 'title':
-                news_data = news_data.from_self().order_by(News.title.desc()).all()
+                news_data = news_data.from_self().order_by(self.news_model.title.desc()).offset(offset).limit(limit)
             elif order_by_desc == 'created':
-                news_data = news_data.from_self().order_by(News.created.desc()).all()
+                news_data = news_data.from_self().order_by(self.news_model.created.desc()).offset(offset).limit(limit)
             elif order_by_desc == 'url':
-                news_data = news_data.from_self().order_by(News.url.desc()).all()
+                news_data = news_data.from_self().order_by(self.news_model.url.desc()).offset(offset).limit(limit)
             elif order_by_desc == 'id':
-                news_data = news_data.from_self().order_by(News.id.desc()).all()
+                news_data = news_data.from_self().order_by(self.news_model.id.desc()).offset(offset).limit(limit)
         else:
             if order_by == 'title':
-                news_data = news_data.from_self().order_by(News.title).all()
+                news_data = news_data.from_self().order_by(self.news_model.title).offset(offset).limit(limit)
             elif order_by == 'created':
-                news_data = news_data.from_self().order_by(News.created).all()
+                news_data = news_data.from_self().order_by(self.news_model.created).offset(offset).limit(limit)
             elif order_by == 'url':
-                news_data = news_data.from_self().order_by(News.url).all()
+                news_data = news_data.from_self().order_by(self.news_model.url).offset(offset).limit(limit)
             elif order_by == 'id':
-                news_data = news_data.from_self().order_by(News.id).all()
+                news_data = news_data.from_self().order_by(self.news_model.id).offset(offset).limit(limit)
 
+        # news_data = news_data.from_self().offset(offset).limit(limit)
+
+        return news_data
+
+    def conver_to_json(self, news_data):
         rows = []
         news_id = 0
         for news in news_data:
@@ -66,7 +77,5 @@ class DataBase:
                          'url': news.url,
                          'created': news.created.isoformat(" ", "seconds")
                          })
-
         json_rows = json.dumps(rows, indent=4)
-
         return json_rows
