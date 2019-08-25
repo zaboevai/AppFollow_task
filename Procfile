@@ -1,1 +1,2 @@
-web: python hacker_news.py runserver 0.0.0.0:8000
+web: python api.py
+worker: python hacker_news.py
