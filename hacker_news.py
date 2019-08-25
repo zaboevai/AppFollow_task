@@ -30,7 +30,7 @@ def run():
     news_parser = Parser(url=SOURCE_URL,
                          data_base=news_db,
                          news_count=MAX_NEWS_COUNT,
-                         sleep_time=10,
+                         sleep_time=3600,
                          test_mode=False,
                          lock=lock)
     news_parser.start()
