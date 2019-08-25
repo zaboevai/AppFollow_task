@@ -58,7 +58,11 @@ Run news parser:
 
 >requirements.txt
 
-3) создать базу данных
+3. выбрать базу данных в config.py
+
+> SQLALCHEMY_DATABASE_URI=
+
+4) создать базу данных
  
 
 >flask db init 
