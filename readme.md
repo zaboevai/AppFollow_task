@@ -17,6 +17,10 @@ Run news parser:
 
 ### API 
 
+Приложение доступно по ссылке:  
+
+[https://appfollow-hacker-news.herokuapp.com/posts]()
+
 
 Возможные запросы:
 1) По умолчанию выводит 5 последних записей:
