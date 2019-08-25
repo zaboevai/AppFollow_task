@@ -51,19 +51,21 @@ class DataBase:
                 news_data = news_data.from_self().order_by(self.news_model.created.desc()).offset(offset).limit(limit)
             elif order_by_desc == 'url':
                 news_data = news_data.from_self().order_by(self.news_model.url.desc()).offset(offset).limit(limit)
-            elif order_by_desc == 'id':
+            else:
                 news_data = news_data.from_self().order_by(self.news_model.id.desc()).offset(offset).limit(limit)
-        else:
+
+        elif order_by:
+
             if order_by == 'title':
                 news_data = news_data.from_self().order_by(self.news_model.title).offset(offset).limit(limit)
             elif order_by == 'created':
                 news_data = news_data.from_self().order_by(self.news_model.created).offset(offset).limit(limit)
             elif order_by == 'url':
                 news_data = news_data.from_self().order_by(self.news_model.url).offset(offset).limit(limit)
-            elif order_by == 'id':
+            else:
                 news_data = news_data.from_self().order_by(self.news_model.id).offset(offset).limit(limit)
-
-        # news_data = news_data.from_self().offset(offset).limit(limit)
+        else:
+            news_data = news_data.from_self().offset(offset).limit(limit)
 
         return news_data
 
