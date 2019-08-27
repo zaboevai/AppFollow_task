@@ -30,7 +30,9 @@ NEWS_TEST_DATA = [
 
 
 class HackerNewsHandler(HTMLParser, ABC):
-
+    """
+    Обработчик новостей с сайта hacker news
+    """
     def __init__(self, url, news_count=0):
         super().__init__()
         self.url = url
@@ -40,7 +42,12 @@ class HackerNewsHandler(HTMLParser, ABC):
         self.is_find = False
 
     def handle_starttag(self, tag, attrs):
-
+        """
+        Обработка начала тега html страницы
+        :param tag:
+        :param attrs:
+        :return:
+        """
         if self.news_count == len(self.news):
             return
 
@@ -59,17 +66,31 @@ class HackerNewsHandler(HTMLParser, ABC):
             self.one_news['url'] = attrs['href']
 
     def handle_data(self, data):
+        """
+        Обработка тела тега html страницы
+        :param data:
+        :return:
+        """
         if self.is_find:
             self.one_news['title'] = data
             self.one_news['created'] = datetime.today()
 
     def handle_endtag(self, tag):
+        """
+        Обработка конца тега html страницы
+        :param tag:
+        :return:
+        """
         if self.is_find:
             news = self.one_news.copy()
             self.news.append(news)
             self.is_find = False
 
     def get_news(self):
+        """
+        Возвращает найденные новости со страницы сайта
+        :return:
+        """
         response = requests.get(url=self.url)
         self.feed(response.text)
         return self.news
