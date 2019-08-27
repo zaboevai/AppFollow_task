@@ -2,6 +2,9 @@ from app import db
 
 
 class News(db.Model):
+    """
+    Таблица новостей
+    """
     __tablename__ = 'news'
 
     id = db.Column(db.Integer, primary_key=True)
