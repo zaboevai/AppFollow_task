@@ -2,7 +2,7 @@ from threading import Lock
 
 from app import app, news_db
 from parsers.core import Parser
-from parsers.news import HackerNews
+from parsers.news import HackerNewsHandler
 
 SOURCE_URL = 'https://news.ycombinator.com'
 
@@ -27,13 +27,13 @@ API
 
 
 def run():
+    """
+    Запуск парсинга сайта и вставки полученных записей в БД
+    """
     lock = Lock()
-    news_parser = Parser(url=SOURCE_URL,
-                         data_base=news_db,
-                         schema=HackerNews,
-                         news_count=MAX_NEWS_COUNT,
+    news_parser = Parser(data_base=news_db,
+                         schema=HackerNewsHandler(SOURCE_URL, MAX_NEWS_COUNT),
                          sleep_time=3600,
-                         test_mode=False,
                          lock=lock)
     news_parser.start()
     news_parser.join()

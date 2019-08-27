@@ -23,7 +23,7 @@ class Parser(Thread):
         with self.lock:
             self.inserted_count = self.db.insert(self.db.table_news, parsed_news)
 
-    def start(self):
+    def launch_once(self):
         """
         Разовый запуск процедуры
         :return:
@@ -39,7 +39,7 @@ class Parser(Thread):
         """
         try:
             while True:
-                self.start()
+                self.launch_once()
                 time.sleep(self.sleep_time)
 
         except BaseException as exc:
