@@ -8,7 +8,7 @@ from parsers.news import NEWS_TEST_DATA, HackerNews
 
 class Parser(Thread):
 
-    def __init__(self, data_base, url, news_count=0, sleep_time=0, test_mode=False, lock=None):
+    def __init__(self, url, data_base, schema, news_count=0, sleep_time=0, test_mode=False, lock=None):
         super().__init__()
         self.url = url
         self.news_count = news_count
@@ -17,6 +17,7 @@ class Parser(Thread):
         self.inserted_count = 0
         self.sleep_time = sleep_time
         self.db = data_base
+        self.parser_schema = schema(url, news_count)
 
     def get_news(self, ):
 
@@ -24,9 +25,9 @@ class Parser(Thread):
             parsed_news = NEWS_TEST_DATA
         else:
             response = requests.get(url=self.url)
-            parser = HackerNews(url=self.url, news_count=self.news_count)
-            parser.feed(response.text)
-            parsed_news = parser.get_news()
+            # news_parser = HackerNews(url=self.url, news_count=self.news_count)
+            self.parser_schema.feed(response.text)
+            parsed_news = self.parser_schema.get_news()
         return parsed_news
 
     def insert_news_to_db(self, db, parsed_news):
