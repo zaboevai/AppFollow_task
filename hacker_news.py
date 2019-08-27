@@ -33,7 +33,7 @@ def run():
     lock = Lock()
     news_parser = Parser(data_base=news_db,
                          schema=HackerNewsHandler(SOURCE_URL, MAX_NEWS_COUNT),
-                         sleep_time=3600,
+                         sleep_time=60,
                          lock=lock)
     news_parser.start()
     news_parser.join()
