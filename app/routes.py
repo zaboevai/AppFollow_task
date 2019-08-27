@@ -27,7 +27,7 @@ def index_page():
                                         order_by=parsed_query['order'],
                                         order_by_desc=parsed_query['order_desc'])
 
-        json_rows = news_db.conver_to_json(rows)
+        json_rows = news_db.convert_to_json(rows)
 
         if rows:
             return Response(json_rows, 200, mimetype='application/json')

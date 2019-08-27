@@ -7,7 +7,7 @@ class DataBase:
         self.db = data_base
         try:
             from app.models import News
-            self.news_model = News
+            self.table_news = News
         except ImportError:
             raise ImportError
 
@@ -33,7 +33,7 @@ class DataBase:
         return False
 
     def get_total_count_rows_from_db(self):
-        total_rows = self.db.session.query(self.news_model).filter().count()
+        total_rows = self.db.session.query(self.table_news).filter().count()
         return total_rows
 
     def get_rows_from_db(self, limit=None, offset=None, order_by=None, order_by_desc=None):
@@ -42,34 +42,35 @@ class DataBase:
 
         total_limit = int(limit)+int(offset)
 
-        news_data = self.db.session.query(self.news_model).order_by(self.news_model.created.desc()).limit(total_limit)
+        news_data = self.db.session.query(self.table_news).order_by(self.table_news.created.desc()).limit(total_limit)
 
         if order_by_desc:
             if order_by_desc == 'title':
-                news_data = news_data.from_self().order_by(self.news_model.title.desc()).offset(offset).limit(limit)
+                news_data = news_data.from_self().order_by(self.table_news.title.desc()).offset(offset).limit(limit)
             elif order_by_desc == 'created':
-                news_data = news_data.from_self().order_by(self.news_model.created.desc()).offset(offset).limit(limit)
+                news_data = news_data.from_self().order_by(self.table_news.created.desc()).offset(offset).limit(limit)
             elif order_by_desc == 'url':
-                news_data = news_data.from_self().order_by(self.news_model.url.desc()).offset(offset).limit(limit)
+                news_data = news_data.from_self().order_by(self.table_news.url.desc()).offset(offset).limit(limit)
             else:
-                news_data = news_data.from_self().order_by(self.news_model.id.desc()).offset(offset).limit(limit)
+                news_data = news_data.from_self().order_by(self.table_news.id.desc()).offset(offset).limit(limit)
 
         elif order_by:
 
             if order_by == 'title':
-                news_data = news_data.from_self().order_by(self.news_model.title).offset(offset).limit(limit)
+                news_data = news_data.from_self().order_by(self.table_news.title).offset(offset).limit(limit)
             elif order_by == 'created':
-                news_data = news_data.from_self().order_by(self.news_model.created).offset(offset).limit(limit)
+                news_data = news_data.from_self().order_by(self.table_news.created).offset(offset).limit(limit)
             elif order_by == 'url':
-                news_data = news_data.from_self().order_by(self.news_model.url).offset(offset).limit(limit)
+                news_data = news_data.from_self().order_by(self.table_news.url).offset(offset).limit(limit)
             else:
-                news_data = news_data.from_self().order_by(self.news_model.id).offset(offset).limit(limit)
+                news_data = news_data.from_self().order_by(self.table_news.id).offset(offset).limit(limit)
         else:
             news_data = news_data.from_self().offset(offset).limit(limit)
 
         return news_data
 
-    def conver_to_json(self, news_data):
+    @staticmethod
+    def convert_to_json(news_data):
         rows = []
         news_id = 0
         for news in news_data:

@@ -1,7 +1,10 @@
+import urllib
 from abc import ABC
 from datetime import datetime
 from html.parser import HTMLParser
 from urllib.parse import urlparse, urljoin
+
+import requests
 
 NEWS_TEST_DATA = [
     {"title": "title_1123",
@@ -26,48 +29,47 @@ NEWS_TEST_DATA = [
 ]
 
 
-class HackerNews(HTMLParser, ABC):
+class HackerNewsHandler(HTMLParser, ABC):
 
-    def __init__(self, url, news_count=0, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.is_find = False
-        self.news_count = news_count
-        self.fresh_news = []
-        self.news = {}
+    def __init__(self, url, news_count=0):
+        super().__init__()
         self.url = url
-        self.base_url = url.split('/news?')[0]
+        self.news_count = news_count
+        self.one_news = {}
+        self.news = []
         self.is_find = False
 
     def handle_starttag(self, tag, attrs):
 
-        if self.news_count == len(self.fresh_news):
+        if self.news_count == len(self.news):
             return
 
         attrs = dict(attrs)
         if not (tag == 'a' and 'storylink' in attrs.values()):
             return
 
-        self.news.clear()
+        self.one_news.clear()
         self.is_find = True
 
         url_scheme = urlparse(attrs['href'])[0]
         if not url_scheme:
-            self.news['url'] = urljoin(base=self.base_url, url=attrs['href'])
+            base_url = self.url.split('/news?')[0]
+            self.one_news['url'] = urljoin(base=base_url, url=attrs['href'])
         else:
-            self.news['url'] = attrs['href']
+            self.one_news['url'] = attrs['href']
 
     def handle_data(self, data):
         if self.is_find:
-            self.news['title'] = data
-            self.news['created'] = datetime.today()
+            self.one_news['title'] = data
+            self.one_news['created'] = datetime.today()
 
     def handle_endtag(self, tag):
         if self.is_find:
-            news = self.news.copy()
-            self.fresh_news.append(news)
+            news = self.one_news.copy()
+            self.news.append(news)
             self.is_find = False
 
     def get_news(self):
-        return self.fresh_news
-
-
+        response = requests.get(url=self.url)
+        self.feed(response.text)
+        return self.news
