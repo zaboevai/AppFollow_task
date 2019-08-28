@@ -26,6 +26,14 @@ API
 """
 
 
+# TODO
+# 1) cut thread
+# 2) full test cover
+# 3) add logging
+# 4) refactor routes
+# 5) add type notations
+
+
 def run():
     """
     Запуск парсинга сайта и вставки полученных записей в БД
