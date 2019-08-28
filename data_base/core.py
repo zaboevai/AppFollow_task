@@ -41,7 +41,7 @@ class DataBase:
         :param row:     запись
         :return:        результат true - если запись есть в БД
         """
-        row = self.db.session.query(table.id).filter(table.title == row['title'])
+        row = self.db.session.query(table.id).filter(table.title == row['title'], table.url == row['url'])
         for _ in row:
             return True
         return False
