@@ -70,29 +70,15 @@ class DataBase:
         total_limit = int(limit)+int(offset)
 
         news_data = self.db.session.query(self.table_news).order_by(self.table_news.created.desc()).limit(total_limit)
-
+        # TODO test me
         if order_by_desc:
-            if order_by_desc == 'title':
-                news_data = news_data.from_self().order_by(self.table_news.title.desc()).offset(offset).limit(limit)
-            elif order_by_desc == 'created':
-                news_data = news_data.from_self().order_by(self.table_news.created.desc()).offset(offset).limit(limit)
-            elif order_by_desc == 'url':
-                news_data = news_data.from_self().order_by(self.table_news.url.desc()).offset(offset).limit(limit)
-            else:
-                news_data = news_data.from_self().order_by(self.table_news.id.desc()).offset(offset).limit(limit)
-
+            attr = getattr(self.table_news, order_by_desc)
+            news_data.from_self().order_by(attr.desc())
         elif order_by:
+            attr = getattr(self.table_news, order_by)
+            news_data.from_self().order_by(attr)
 
-            if order_by == 'title':
-                news_data = news_data.from_self().order_by(self.table_news.title).offset(offset).limit(limit)
-            elif order_by == 'created':
-                news_data = news_data.from_self().order_by(self.table_news.created).offset(offset).limit(limit)
-            elif order_by == 'url':
-                news_data = news_data.from_self().order_by(self.table_news.url).offset(offset).limit(limit)
-            else:
-                news_data = news_data.from_self().order_by(self.table_news.id).offset(offset).limit(limit)
-        else:
-            news_data = news_data.from_self().offset(offset).limit(limit)
+        news_data = news_data.from_self().offset(offset).limit(limit)
 
         return news_data
 
